@@ -36,10 +36,14 @@ In `Settings -> Input -> Hotkeys` configure a Quit button. I have mine set to `M
 Once you've completed this, make sure to save your configuration (`Configuration File -> Save Current Configuration`)
 
 # Controls:
-- MENU (Hold) *or* MENU + SELECT: Shutoff device
-- X: Exit GameSwitcher
-- A: Launch Game
-- Left/Right: Navigate recent games
+
+If you followed the configuration guide, you can now open games from the GameSwitcher by pressing `A`, and close them by pressing `MENU + SELECT`.
+Keep `MENU + SELECT` held to power off. The next time you power on, you should be back to the GameSwitcher screen with your last played save.  
+
+- `MENU (Hold) or MENU + SELECT`: Shutoff device
+- `X`: Exit GameSwitcher
+- `A`: Launch Game
+- `Left/Right`: Navigate recent games
 
 
 # How To Build
