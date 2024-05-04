@@ -1,0 +1,34 @@
+#pragma once
+
+enum RGPad
+{
+    RGPAD_UP = 1,
+    RGPAD_RIGHT = 2,
+    RGPAD_DOWN = 4,
+    RGPAD_LEFT = 8,
+    RGPAD_CENTER = 0,
+};
+
+enum RGButton
+{
+    RGBUTTON_VOL_DOWN = 1,
+    RGBUTTON_VOL_UP = 2,
+    RGBUTTON_A = 3,
+    RGBUTTON_B = 4,
+    RGBUTTON_Y = 5,
+    RGBUTTON_X = 6,
+    RGBUTTON_L1 = 7,
+    RGBUTTON_R1 = 8,
+    RGBUTTON_SELECT = 9,
+    RGBUTTON_START = 10,
+    RGBUTTON_MENU = 11,
+    RGBUTTON_L2 = 13,
+    RGBUTTON_R2 = 14,
+};
+
+enum AppState
+{
+    APPSTATE_RECENTVIEW = 0,
+    APPSTATE_FAVORITELIST = 1,
+    APPSTATE_RECENTLIST = 2,
+};

@@ -1,11 +1,9 @@
-
-#ifndef STR_HELPERS_H
-#define STR_HELPERS_H
+#pragma once
 
 #include <cstdlib>
 #include <string>
 
-bool strEndsWith(std::string str, std::string suffix)
+inline bool strEndsWith(std::string str, std::string suffix)
 {
     if (str.length() < suffix.length())
     {
@@ -14,7 +12,7 @@ bool strEndsWith(std::string str, std::string suffix)
     return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
 }
 
-bool strStartsWith(std::string str, std::string prefix)
+inline bool strStartsWith(std::string str, std::string prefix)
 {
     if (str.length() < prefix.length())
     {
@@ -23,7 +21,7 @@ bool strStartsWith(std::string str, std::string prefix)
     return str.compare(0, prefix.length(), prefix) == 0;
 }
 
-std::string strToUpper(const std::string &str)
+inline std::string strToUpper(const std::string &str)
 {
     std::string result(str); // Create a copy of str
     for (char &c : result)
@@ -33,7 +31,7 @@ std::string strToUpper(const std::string &str)
     return result;
 }
 
-std::string strToLower(const std::string &str)
+inline std::string strToLower(const std::string &str)
 {
     std::string result(str); // Create a copy of str
     for (char &c : result)
@@ -42,7 +40,7 @@ std::string strToLower(const std::string &str)
     }
     return result;
 }
-std::string strReplaceAll(const std::string &str, const std::string &from, const std::string &to)
+inline std::string strReplaceAll(const std::string &str, const std::string &from, const std::string &to)
 {
     std::string result = str;
     size_t startPos = 0;
@@ -54,7 +52,7 @@ std::string strReplaceAll(const std::string &str, const std::string &from, const
     return result;
 }
 
-std::vector<std::string> strSplit(const std::string &str, char delimiter)
+inline std::vector<std::string> strSplit(const std::string &str, char delimiter)
 {
     std::vector<std::string> tokens;
     std::stringstream ss(str);
@@ -68,7 +66,7 @@ std::vector<std::string> strSplit(const std::string &str, char delimiter)
     return tokens;
 }
 
-std::string strJoin(const std::vector<std::string> &strings, std::string delimiter)
+inline std::string strJoin(const std::vector<std::string> &strings, std::string delimiter)
 {
     std::string result;
     for (size_t i = 0; i < strings.size(); ++i)
@@ -82,4 +80,16 @@ std::string strJoin(const std::vector<std::string> &strings, std::string delimit
     return result;
 }
 
-#endif
+inline std::string strLeftPadInt(int num, size_t width, char padChar = '0')
+{
+    std::stringstream ss;
+    ss << num;
+    std::string str = ss.str();
+
+    if (str.length() < width)
+    {
+        str = std::string(width - str.length(), padChar) + str;
+    }
+
+    return str;
+}

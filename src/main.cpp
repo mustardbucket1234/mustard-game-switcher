@@ -14,6 +14,9 @@
 #include "font.h"
 #include "gameInfo.h"
 #include "mrenderer.h"
+#include "enum.h"
+#include "helpers/strHelpers.h"
+#include "helpers/mathHelpers.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -30,10 +33,12 @@ string ROM_GO = "/tmp/rom_go";
 #ifdef DEBUG
 bool debugMode = true;
 string MUOS_HISTORY_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/info/history";
+string MUOS_FAVORITE_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/info/favourite";
 string MUOS_SAVE_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/save/state";
 #else
 bool debugMode = false;
 string MUOS_HISTORY_DIR = "/mnt/mmc/MUOS/info/history";
+string MUOS_FAVORITE_DIR = "/mnt/mmc/MUOS/info/favourite";
 string MUOS_SAVE_DIR = "/mnt/mmc/MUOS/save/state";
 #endif
 
@@ -42,40 +47,30 @@ SDL_Color shadowTextColor = {0, 0, 0, 225};
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
 TTF_Font *defaultFont = nullptr;
+TTF_Font *mdFont = nullptr;
+TTF_Font *lgFont = nullptr;
 TTF_Font *titleFont = nullptr;
 SDL_Joystick *joystick = nullptr;
 
-vector<GameInfoData> gameList;
+vector<GameInfoData> recentGameList;
+vector<GameInfoData> favoriteGameList;
+vector<GameInfoData> currentGameList;
 GameInfoData selectedGame;
 GameVisualData selectedGameVisual;
 Mustard::Renderer *mrenderer = nullptr;
 int selectedGameIndex;
 
-enum RGPad
-{
-    RGPAD_UP = 1,
-    RGPAD_RIGHT = 2,
-    RGPAD_DOWN = 4,
-    RGPAD_LEFT = 8,
-    RGPAD_CENTER = 0,
-};
+AppState appState = APPSTATE_RECENTVIEW;
+bool isListView = false;
+bool isPictureView = false;
+double camX;
+double camY;
 
-enum RGButton
-{
-    RGBUTTON_VOL_DOWN = 1,
-    RGBUTTON_VOL_UP = 2,
-    RGBUTTON_A = 3,
-    RGBUTTON_B = 4,
-    RGBUTTON_Y = 5,
-    RGBUTTON_X = 6,
-    RGBUTTON_L1 = 7,
-    RGBUTTON_R1 = 8,
-    RGBUTTON_SELECT = 9,
-    RGBUTTON_START = 10,
-    RGBUTTON_MENU = 11,
-    RGBUTTON_L2 = 13,
-    RGBUTTON_R2 = 14,
-};
+double approachCamX;
+double approachCamY;
+
+int dirXInput = 0;
+int dirYInput = 0;
 
 void initSDL()
 {
@@ -98,8 +93,10 @@ void initSDL()
         mrenderer = new Mustard::Renderer(renderer);
     }
     TTF_Init();
-    defaultFont = TTF_OpenFont("assets/font/Allerta-Regular.ttf", 22);
-    titleFont = TTF_OpenFont("assets/font/Allerta-Regular.ttf", 45);
+    defaultFont = TTF_OpenFont("assets/font/Allerta-Regular.ttf", 24);
+    mdFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 28);
+    lgFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 38);
+    titleFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 45);
 }
 
 // Clear buffers
@@ -117,25 +114,31 @@ void renderBlackScreen()
 // Render screen
 void renderGameSwitcher()
 {
-
-    bool drawPicture = true;
-    bool drawList = false;
-
-    if (drawPicture)
+    if (isPictureView)
     {
-        string bg = "assets/theme/bg.png";
+        approachCamX = 0;
+        approachCamY = 0;
         string header = "assets/theme/header.png";
-        string footer = "assets/theme/footer.png";
-        mrenderer->draw(bg, 0, 0, 640, 480);
-        if (selectedGameVisual.active)
+
+        // Draw background text
+        if (selectedGame.active)
         {
-            // Draw the image
-            string path = selectedGameVisual.filePath;
-            mrenderer->drawPreserveAspect(path, 320, 240, 640, 400, 0, 1);
+            drawTextCentered(selectedGame.coreName, defaultFont, renderer, 0 - camX * 0.5, 216, 640, {255, 255, 255, 80});
         }
 
+        // Draw the image
+        if (selectedGameVisual.active)
+        {
+            string path = selectedGameVisual.filePath;
+            auto *textureData = mrenderer->getData(path);
+            if (textureData && textureData->width > 32 && textureData->height > 32)
+            {
+                mrenderer->drawPreserveAspect(path, 320 - camX, 240, 640, 400, 0, 1);
+            }
+        }
+
+        // Draw top text / header
         mrenderer->draw(header, 0, 0, 640, 40);
-        mrenderer->draw(footer, 0, 440, 640, 40);
         if (selectedGame.active)
         {
             string prettyName = selectedGame.name;
@@ -148,28 +151,59 @@ void renderGameSwitcher()
             drawTextCentered(prettyName, defaultFont, renderer, 0, 4, 640, defaultTextColor);
         }
     }
-    if (drawList)
+    if (isListView)
     {
-        string text = "Game Switcher\nRoms: " + to_string(gameList.size()) + "\n";
-        for (int i = 0; i < gameList.size(); i++)
+        approachCamX = 0;
+        const int leftMargin = 32;
+        const int topMargin = 24;
+        const int titleMargin = 60;
+        const int lineHeight = 42;
+        auto calcY = [](int y, int offset = 0)
         {
-            string prettyName = gameList[i].name;
-            int maxLen = 40;
-            if (prettyName.length() > maxLen)
+            return titleMargin + topMargin + y * lineHeight + offset;
+        };
+
+        int selectedY = calcY(selectedGameIndex, 0);
+        if (selectedY > 150)
+        {
+            approachCamY = selectedY - 150;
+        }
+        else
+        {
+            approachCamY = 0;
+        }
+
+        drawText("Favorites", lgFont, renderer, leftMargin, topMargin - camY, {200, 175, 25, 255});
+        for (int i = 0; i < currentGameList.size(); i++)
+        {
+            string prettyName = currentGameList[i].name;
+            int maxLen = 48;
+            int textY = calcY(i) - camY;
+
+            // Check if screen position is in range
+            if (textY > -35 && textY < 480 + 35)
             {
-                prettyName = prettyName.substr(0, maxLen - 2) + "...";
-            }
-            if (i == selectedGameIndex)
-            {
-                text += "> " + prettyName + "\n";
-            }
-            else
-            {
-                text += prettyName + "\n";
+                int textX = leftMargin;
+                if (prettyName.length() > maxLen)
+                {
+                    prettyName = prettyName.substr(0, maxLen - 2) + "...";
+                }
+                string text;
+                text = prettyName;
+                if (i == selectedGameIndex)
+                {
+                    mrenderer->drawRect(0, textY - 5, 640, lineHeight, {255, 255, 255, 25});
+                    drawText(text, defaultFont, renderer, textX, textY, {220, 190, 25, 255});
+                }
+                else
+                {
+                    drawText(text, defaultFont, renderer, textX, textY, defaultTextColor);
+                }
             }
         }
-        drawTextWrapped(text, defaultFont, renderer, 4, 12, 640, defaultTextColor);
     }
+    string footer = "assets/theme/footer.png";
+    mrenderer->draw(footer, 0, 440, 640, 40);
 }
 
 // Blit a color to the screen. Can be transparent
@@ -191,14 +225,65 @@ void applyRender()
     SDL_RenderPresent(renderer);
 }
 
-void updateSelectedGame()
+void updateAppState()
 {
-    int games = gameList.size();
+
+    if (appState == APPSTATE_RECENTVIEW)
+    {
+        isListView = false;
+        isPictureView = true;
+        currentGameList = recentGameList;
+    }
+
+    if (isPictureView)
+    {
+
+        if (dirXInput != 0)
+        {
+            selectedGameIndex += dirXInput;
+            camX -= dirXInput * 32;
+        }
+    }
+    if (isListView)
+    {
+        if (dirYInput != 0)
+        {
+            selectedGameIndex -= dirYInput;
+        }
+        if (dirXInput != 0)
+        {
+            selectedGameIndex += dirXInput;
+
+            int jumpSize = 4;
+            if (dirXInput < 0)
+            {
+                for (int i = 0; i < jumpSize; i++)
+                {
+                    if (selectedGameIndex > 0)
+                    {
+                        selectedGameIndex--;
+                    }
+                }
+            }
+            else if (dirXInput > 0)
+            {
+                for (int i = 0; i < jumpSize; i++)
+                {
+                    if (selectedGameIndex < currentGameList.size() - 1)
+                    {
+                        selectedGameIndex++;
+                    }
+                }
+            }
+        }
+    }
+
+    int games = currentGameList.size();
     if (games > 0)
     {
         // Ensure negative numbers wrap around
         selectedGameIndex = (selectedGameIndex + games * 100) % games;
-        selectedGame = gameList[selectedGameIndex];
+        selectedGame = currentGameList[selectedGameIndex];
     }
     else
     {
@@ -261,28 +346,41 @@ void startSDLPhase()
             startNextPhase = 1;
         }
 
+        dirXInput = 0;
+        dirYInput = 0;
         // Handle Directional input
         {
-            int desiredDeltaIndex = 0;
+            int desiredXIndex = 0;
+            int desiredYIndex = 0;
             if (SDL_JoystickGetHat(joystick, 0) == RGPAD_RIGHT || keyboardState[SDL_SCANCODE_RIGHT])
             {
-                desiredDeltaIndex = 1;
+                desiredXIndex = 1;
             }
             else if (SDL_JoystickGetHat(joystick, 0) == RGPAD_LEFT || keyboardState[SDL_SCANCODE_LEFT])
             {
-                desiredDeltaIndex = -1;
+                desiredXIndex = -1;
+            }
+            if (SDL_JoystickGetHat(joystick, 0) == RGPAD_DOWN || keyboardState[SDL_SCANCODE_DOWN])
+            {
+                desiredYIndex = -1;
+            }
+            else if (SDL_JoystickGetHat(joystick, 0) == RGPAD_UP || keyboardState[SDL_SCANCODE_UP])
+            {
+                desiredYIndex = 1;
             }
 
-            if (desiredDeltaIndex != 0)
+            if (desiredXIndex != 0 || desiredYIndex != 0)
             {
                 // Tetris Auto-repeat
                 if (dasTimer <= 0.0)
                 {
-                    selectedGameIndex += desiredDeltaIndex;
+                    dirXInput += desiredXIndex;
+                    dirYInput += desiredYIndex;
                 }
                 else if (dasTimer > 0.2666)
                 {
-                    selectedGameIndex += desiredDeltaIndex;
+                    dirXInput += desiredXIndex;
+                    dirYInput += desiredYIndex;
                     dasTimer -= 0.1;
                 }
                 dasTimer += deltaTime;
@@ -293,10 +391,10 @@ void startSDLPhase()
             }
         }
 
-        updateSelectedGame();
+        updateAppState();
 
         // Shutdown if MENU or ESCAPE is pressed
-        if (sdlTime > 0.15 && (SDL_JoystickGetButton(joystick, RGBUTTON_MENU) || keyboardState[SDL_SCANCODE_ESCAPE]))
+        if (sdlTime > 0.1 && (SDL_JoystickGetButton(joystick, RGBUTTON_MENU) || keyboardState[SDL_SCANCODE_ESCAPE]))
         {
             // drawTextCentered("Hold to Power Off...", defaultFont, renderer, 0, 200, 640, defaultTextColor);
             if (shutoffHoldTimer > 0.34)
@@ -332,14 +430,24 @@ void startSDLPhase()
             startRender();
             renderGameSwitcher();
             applyRender();
-            SDL_Delay(30);
         }
 
+        // Update at 60 FPS if possible. Min Delay of 4
+        SDL_Delay(4);
+        while (SDL_GetTicks() - lastTicks < 16)
+        {
+            SDL_Delay(1);
+        }
         uint32_t currentTicks = SDL_GetTicks();
         deltaTime = (currentTicks - lastTicks) / 1000.0;
         lastTicks = currentTicks;
         sdlTime += deltaTime;
 
+        camY = lerp(camY, approachCamY, 0.1);
+        camY = clamp(camY, approachCamY - 200, approachCamY + 200);
+
+        camX = lerp(camX, approachCamX, 0.1);
+        camX = clamp(camX, approachCamX - 200, approachCamX + 200);
         if (startNextPhase == 1)
         {
             break;
@@ -365,13 +473,15 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < 999; i++)
     {
-        gameList = loadGameListAtPath(MUOS_HISTORY_DIR);
+        recentGameList = loadGameListAtPath(MUOS_HISTORY_DIR);
+        favoriteGameList = loadGameListAtPath(MUOS_FAVORITE_DIR);
+        currentGameList = recentGameList;
 
         // Trim list to 10 games
-        if (gameList.size() > 10)
-        {
-            gameList.resize(10);
-        }
+        // if (recentGameList.size() > 10)
+        // {
+        //     recentGameList.resize(10);
+        // }
 
         startSDLPhase();
 
@@ -423,7 +533,6 @@ int main(int argc, char *argv[])
                 printf("Proceeding to game...\n");
 
                 renderColor({0, 0, 0, 180});
-                // drawTextCentered("Launching Game...", titleFont, renderer, 0, 200, 640, {255, 255, 255, 45});
                 applyRender();
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));

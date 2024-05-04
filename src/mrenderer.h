@@ -131,7 +131,7 @@ namespace Mustard
         }
 
         // Draw a rectangle
-        void drawRect(int x, int y, int w, int h, SDL_Color color)
+        void drawRect(double x, double y, double w, double h, SDL_Color color)
         {
             if (color.a < 255)
             {
