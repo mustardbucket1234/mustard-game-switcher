@@ -2,8 +2,7 @@
 
 A GameSwitcher app for muOS v10 inspired by onionOS
 
-<img src="https://media.giphy.com/media/xWxJqeG7IiSWXMgM8i/giphy.gif" width="400">
-
+<img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeG1oMjY3ZHNubnpnMTJpMmg5MGUwemcwenJ2eTZxY3lpdDZheGhydCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Pq4IfxNQF8FO6e1x0g/source.gif" width="360">
 
 The GameSwitcher allows you to launch your Recent/Favorite Retroarch games and jump between them.
 It also allows for setting up a quick save, shutoff, and resume feature (with some configuration required)
