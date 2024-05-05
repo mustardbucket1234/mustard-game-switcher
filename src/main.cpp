@@ -55,6 +55,7 @@ SDL_Joystick *joystick = nullptr;
 vector<GameInfoData> recentGameList;
 vector<GameInfoData> favoriteGameList;
 vector<GameInfoData> currentGameList;
+
 GameInfoData selectedGame;
 GameVisualData selectedGameVisual;
 Mustard::Renderer *mrenderer = nullptr;
@@ -63,6 +64,7 @@ int selectedGameIndex;
 AppState appState = APPSTATE_RECENTVIEW;
 bool isListView = false;
 bool isPictureView = false;
+string listViewTitle;
 double camX;
 double camY;
 
@@ -123,7 +125,7 @@ void renderGameSwitcher()
         // Draw background text
         if (selectedGame.active)
         {
-            drawTextCentered(selectedGame.coreName, defaultFont, renderer, 0 - camX * 0.5, 216, 640, {255, 255, 255, 80});
+            drawTextCentered(selectedGame.coreName, defaultFont, renderer, 0 - camX * 0.5, 216 - camY, 640, {255, 255, 255, 80});
         }
 
         // Draw the image
@@ -133,7 +135,7 @@ void renderGameSwitcher()
             auto *textureData = mrenderer->getData(path);
             if (textureData && textureData->width > 32 && textureData->height > 32)
             {
-                mrenderer->drawPreserveAspect(path, 320 - camX, 240, 640, 400, 0, 1);
+                mrenderer->drawPreserveAspect(path, 320 - camX, 240 - camY, 640, 400, 0, 1);
             }
         }
 
@@ -173,7 +175,8 @@ void renderGameSwitcher()
             approachCamY = 0;
         }
 
-        drawText("Favorites", lgFont, renderer, leftMargin, topMargin - camY, {200, 175, 25, 255});
+        // Draw title
+        drawText(listViewTitle, lgFont, renderer, leftMargin, topMargin - camY, {200, 175, 25, 255});
         for (int i = 0; i < currentGameList.size(); i++)
         {
             string prettyName = currentGameList[i].name;
@@ -202,6 +205,8 @@ void renderGameSwitcher()
             }
         }
     }
+
+    // Draw footer
     string footer = "assets/theme/footer.png";
     mrenderer->draw(footer, 0, 440, 640, 40);
 }
@@ -225,19 +230,55 @@ void applyRender()
     SDL_RenderPresent(renderer);
 }
 
-void updateAppState()
+void setAppState(AppState state)
 {
+    camY = -25;
+    camX = 0;
+    approachCamY = 0;
+    approachCamX = 0;
+    appState = state;
+    selectedGameIndex = 0;
+    selectedGame = {};
+    selectedGameVisual = {};
+    listViewTitle = "";
+    isListView = false;
+    isPictureView = false;
+    currentGameList.clear();
 
     if (appState == APPSTATE_RECENTVIEW)
     {
-        isListView = false;
         isPictureView = true;
         currentGameList = recentGameList;
     }
+    else if (appState == APPSTATE_FAVORITELIST)
+    {
+        isListView = true;
+        currentGameList = favoriteGameList;
+        // Sort alphabetically
+        std::sort(currentGameList.begin(), currentGameList.end(), [](const GameInfoData &a, const GameInfoData &b)
+                  { return a.name < b.name; });
+        listViewTitle = "Favorites";
+    }
+    else if (appState == APPSTATE_RECENTLIST)
+    {
+        isListView = true;
+        currentGameList = recentGameList;
+        listViewTitle = "Recent Games";
+        // Sort alphabetically
+        std::sort(currentGameList.begin(), currentGameList.end(), [](const GameInfoData &a, const GameInfoData &b)
+                  { return a.name < b.name; });
+    }
+}
+void nextAppState(int i)
+{
+    setAppState(static_cast<AppState>((appState + i) % 3));
+}
+
+void updateAppState()
+{
 
     if (isPictureView)
     {
-
         if (dirXInput != 0)
         {
             selectedGameIndex += dirXInput;
@@ -292,7 +333,7 @@ void updateAppState()
     }
 
     selectedGameVisual = {};
-    if (selectedGame.active)
+    if (selectedGame.active && isPictureView)
     {
         selectedGameVisual = loadGameVisualData(selectedGame, MUOS_SAVE_DIR);
     }
@@ -302,7 +343,7 @@ void startSDLPhase()
 {
     initSDL();
 
-    selectedGameIndex = 0;
+    setAppState(APPSTATE_RECENTVIEW);
 
     startRender();
     renderGameSwitcher();
@@ -329,6 +370,13 @@ void startSDLPhase()
                 needExit = true;
                 startNextPhase = 1;
                 break;
+            }
+
+            if ((event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == RGBUTTON_B) ||
+                (event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == RGBUTTON_SELECT) ||
+                (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_B))
+            {
+                nextAppState(1);
             }
         }
 

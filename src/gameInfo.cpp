@@ -177,7 +177,7 @@ GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
             {
                 for (const auto &entry : filesystem::directory_iterator(subFolderPath))
                 {
-                    if (entry.path().extension() == ".png" && strStartsWith(strToUpper(entry.path().filename()), strToUpper(game.name)))
+                    if (entry.path().extension() == ".png" && strStartsWith(strToUpper(entry.path().filename()), strToUpper(game.name)) && entry.file_size() > 400)
                     {
                         screenShots.push_back(entry);
                     }
