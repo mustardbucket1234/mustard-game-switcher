@@ -1,16 +1,16 @@
 # GameSwitcher Protoype for RG35XX+ muOS v10
 
-A barebones GameSwitcher app for muOS v10 inspired by onionOS
+A GameSwitcher app for muOS v10 inspired by onionOS
 
-The GameSwitcher allows you to preview your recent Retroarch games and jump between them.
+The GameSwitcher allows you to launch your Recent/Favorite Retroarch games and jump between them.
 It also allows for setting up a quick save, shutoff, and resume feature (with some configuration required)
 
-This is definitely more of a demo than a usable product, and it *MIGHT* break your muOS install. So backup your saves / games before installing.
+This app was developed rapidly so it may have bugs. Backup your saves / games before installing.
 
 # How To Install:
 1. Ensure you have muOS v10 installed and you're running it on a RG35XX+
-2. Download this repository as a ZIP
-3. Move the `/dist` folder of the ZIP into the `ROMS` folder of your RG35XX+ SD card. Rename `/dist` as desired.
+2. Download the latest release ZIP
+3. Copy the contents of the ZIP into the `ROMS` folder of your RG35XX+ SD card 
 4. Navigate to the GameSwitcher on your RG35XX+, and launch it as *External - Ports* (press SELECT if it doesn't work automatically)
 
 After launching, you should now see your recent Retroarch games show up.
@@ -25,11 +25,11 @@ This will allow you to resume the GameSwitcher when you power the device down
 
 2. From the muOS main menu, open `Retroarch`. Then go into `Settings -> Saving` and toggle
 
-- Save State Thumbnails: ON
-- Sort Save States into Folders by Core Name: ON
-- Save State Thumbnails: ON
-- Auto Save State: ON
-- Auto Load State: ON
+- `Save State Thumbnails: ON`
+- `Sort Save States into Folders by Core Name: ON`
+- `Save State Thumbnails: ON`
+- `Auto Save State: ON`
+- `Auto Load State: ON`
 
 In `Settings -> Input -> Hotkeys` configure a Quit button. I have mine set to `Menu + Select`
 
@@ -42,6 +42,7 @@ Keep `MENU + SELECT` held to power off. The next time you power on, you should b
 
 - `MENU (Hold) or MENU + SELECT`: Shutoff device
 - `X`: Exit GameSwitcher
+- `B`: Swap to list view
 - `A`: Launch Game
 - `Left/Right`: Navigate recent games
 
