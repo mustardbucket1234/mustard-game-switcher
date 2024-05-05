@@ -4,4 +4,4 @@
 cd $(realpath "$(dirname "$0")")
 cd ..
 # Run the script
-"./Game Switcher.sh" > log.txt
+"./MustardGameSwitcher.sh" > log.txt
