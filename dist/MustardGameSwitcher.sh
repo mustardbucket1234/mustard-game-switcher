@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# muOS v11 compatibility
+if [ -d "/usr/lib32" ]; then
+    export LD_LIBRARY_PATH=/usr/lib32
+fi
+
 ROM_LAST=/tmp/rom_last
 LAST_PLAY="/opt/muos/config/lastplay.txt"
 
