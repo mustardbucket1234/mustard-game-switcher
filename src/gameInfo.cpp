@@ -36,12 +36,15 @@ GameInfoData loadGameInfo(string filePath)
                 game.coreName = line;
                 break;
             case 3:
-                game.drive = line;
+                game.number = line;
                 break;
             case 4:
-                game.folder = line;
+                game.drive = line;
                 break;
             case 5:
+                game.folder = line;
+                break;
+            case 6:
                 game.fileName = line;
                 break;
             default:
