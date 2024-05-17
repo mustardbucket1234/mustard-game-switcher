@@ -70,6 +70,7 @@ GameInfoData writeGameInfo(string filePath, GameInfoData game)
         file << game.name << std::endl;
         file << game.core << std::endl;
         file << game.coreName << std::endl;
+        file << game.number << std::endl;
         file << game.drive << std::endl;
         file << game.folder << std::endl;
         file << game.fileName << std::endl;
