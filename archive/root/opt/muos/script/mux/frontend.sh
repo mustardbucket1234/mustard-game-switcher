@@ -1,6 +1,8 @@
 #!/bin/sh
 # shellcheck disable=1090,2002
 
+# A customized frontend.sh file for muOS 2405 BEANS Gameswitcher
+
 . /opt/muos/script/system/parse.sh
 CONFIG=/opt/muos/config/config.txt
 
@@ -47,6 +49,16 @@ KILL_SND() {
 		rm "$SND_PIPE"
 	fi
 }
+
+# ************** CUSTOM STUFF FOR GAMESWITCHER ********************
+
+CUSTOM_STARTUP_PATH="/mnt/sdcard/STARTUP/gs_startup.sh"
+if [ -f "$CUSTOM_STARTUP_PATH" ]; then
+    "$CUSTOM_STARTUP_PATH"
+fi
+
+# ************** END CUSTOM STUFF ********************
+
 
 LAST_PLAY="/opt/muos/config/lastplay.txt"
 STARTUP=$(parse_ini "$CONFIG" "settings.general" "startup")
