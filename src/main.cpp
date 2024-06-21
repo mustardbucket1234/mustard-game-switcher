@@ -95,10 +95,10 @@ void initSDL()
         mrenderer = new Mustard::Renderer(renderer);
     }
     TTF_Init();
-    defaultFont = TTF_OpenFont("assets/font/Allerta-Regular.ttf", 24);
-    mdFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 28);
-    lgFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 38);
-    titleFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 45);
+    defaultFont = TTF_OpenFont("assets/font/Orbitron-Medium-Uppercase.ttf", 24);
+    mdFont = TTF_OpenFont("assets/font/Orbitron-Medium-Uppercase.ttf", 28);
+    lgFont = TTF_OpenFont("assets/font/Orbitron-Medium-Uppercase.ttf", 38);
+    titleFont = TTF_OpenFont("assets/font/Orbitron-Medium-Uppercase.ttf", 45);
 }
 
 // Clear buffers
