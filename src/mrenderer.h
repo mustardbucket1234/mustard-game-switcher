@@ -49,15 +49,14 @@ namespace Mustard
             return nullptr;
         }
 
-        TextureData *getData(const std::string &filename)
+        TextureData* getData(const std::string &filename)
         {
-
             // Check if texture is already cached
             if (textureMap.find(filename) != textureMap.end())
             {
                 return &textureMap[filename];
             }
-
+        
             // Load surface and texture
             SDL_Surface *surface = IMG_Load(filename.c_str());
             if (!surface)
@@ -65,7 +64,7 @@ namespace Mustard
                 std::cerr << "Failed to load surface: " << SDL_GetError() << std::endl;
                 return nullptr;
             }
-
+        
             SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
             if (!texture)
             {
@@ -73,11 +72,11 @@ namespace Mustard
                 SDL_FreeSurface(surface);
                 return nullptr;
             }
-
+        
             // Cache the texture
-            TextureData data = {filename, surface, texture, surface->w, surface->h, (double)surface->w / (double)surface->h};
+            TextureData data{filename, surface, texture, surface->w, surface->h, (double)surface->w / (double)surface->h};
             textureMap[filename] = data;
-            return &data;
+            return &textureMap[filename];
         }
 
         void draw(std::string &filename, int x, int y, int w, int h)
@@ -106,10 +105,10 @@ namespace Mustard
         void drawScaled(SDL_Texture *texture, double centerX, double centerY, double w, double h, double rotation, double scale)
         {
             SDL_Rect destRect = {
-                centerX - w * 0.5 * scale,
-                centerY - h * 0.5 * scale,
-                w * scale,
-                h * scale};
+                static_cast<int>(centerX - ((w * 0.5) * scale)),
+                static_cast<int>(centerY - ((h * 0.5) * scale)),
+                static_cast<int>(w * scale),
+                static_cast<int>(h * scale)};
 
             SDL_RenderCopyEx(renderer, texture, NULL, &destRect, rotation, NULL, SDL_FLIP_NONE);
         }
@@ -142,7 +141,7 @@ namespace Mustard
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
             }
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-            SDL_Rect rect = {x, y, w, h};
+            SDL_Rect rect = {static_cast<int>(x), static_cast<int>(y), static_cast<int>(w), static_cast<int>(h)};
             SDL_RenderFillRect(renderer, &rect);
         }
     };
