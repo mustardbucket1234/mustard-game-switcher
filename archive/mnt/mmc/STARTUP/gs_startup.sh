@@ -1,10 +1,6 @@
 #!/bin/sh
 
-# muOS v11 compatibility
-if [ -d "/usr/lib32" ]; then
-    export LD_LIBRARY_PATH=/usr/lib32
-fi
-
+export LD_LIBRARY_PATH=/usr/lib32
 export HOME=/root
 
 # Set the working directory to the directory of this script
@@ -26,7 +22,7 @@ echo "RUNNING GAME SWITCHER"
 
 sleep 10
 
-"/mnt/mmc/APPS/MustardGameSwitcher/MustardGameSwitcher.sh"
+"/mnt/mmc/MUOS/application/MustardGameSwitcher.sh"
 
 echo "FINISHED RUNNING GAME SWITCHER"
 echo "STARTUP FINISHED!"

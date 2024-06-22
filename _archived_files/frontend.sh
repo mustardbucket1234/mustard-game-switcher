@@ -115,14 +115,6 @@ while true; do
 	else
 		KILL_SND
 	fi
-# ************** CUSTOM STUFF FOR GAMESWITCHER ********************
-
-CUSTOM_STARTUP_PATH="/mnt/mmc/STARTUP/gs_startup.sh"
-if [ -f "$CUSTOM_STARTUP_PATH" ]; then
-    "$CUSTOM_STARTUP_PATH"
-fi
-
-# ************** END CUSTOM STUFF ********************
 
 	# Core Association
 	if [ -s "$ASS_GO" ]; then
@@ -317,3 +309,4 @@ fi
 		esac
 	fi
 done
+
