@@ -26,7 +26,7 @@ echo "RUNNING GAME SWITCHER"
 
 sleep 10
 
-"/mnt/sdcard/ROMS/Apps/MustardGameSwitcher.sh"
+"/mnt/mmc/APPS/MustardGameSwitcher/MustardGameSwitcher.sh"
 
 echo "FINISHED RUNNING GAME SWITCHER"
 echo "STARTUP FINISHED!"
