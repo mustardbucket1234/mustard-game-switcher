@@ -1,17 +1,34 @@
 #!/bin/sh
 
-# muOS v11 compatibility
-if [ -d "/usr/lib32" ]; then
-    export LD_LIBRARY_PATH=/usr/lib32
+if pgrep -f "playbgm.sh" > /dev/null; then
+	killall -q "playbgm.sh"
+	killall -q "mp3play"
 fi
 
+if pgrep -f "muplay" > /dev/null; then
+	kill -9 "muplay"
+	rm "$SND_PIPE"
+fi
+
+echo app > /tmp/act_go
+
+. /opt/muos/script/system/parse.sh
+
+DEVICE=$(tr '[:upper:]' '[:lower:]' < "/opt/muos/config/device.txt")
+DEVICE_CONFIG="/opt/muos/device/$DEVICE/config.ini"
+
+STORE_ROM=$(parse_ini "$DEVICE_CONFIG" "storage.rom" "mount")
+SDL_SCALER=$(parse_ini "$DEVICE_CONFIG" "sdl" "scaler")
+
+MGS_DIR="$STORE_ROM/MUOS/application/.MustardGameSwitcher"
+
+cd "$MGS_DIR" || exit
+
+export SDL_GAMECONTROLLERCONFIG_FILE="/usr/lib32/gamecontrollerdb.txt"
 export HOME=/root
-
-ROM_LAST=/tmp/rom_last
-LAST_PLAY="/opt/muos/config/lastplay.txt"
-
-cd "$(realpath "$(dirname "$0")")"
-cd ".data"
+export LD_LIBRARY_PATH=/usr/lib32
+export ROM_LAST=/tmp/rom_last
+export LAST_PLAY="/opt/muos/config/lastplay.txt"
 
 # # Get the data of the current script
 # # Ensure the data is not empty

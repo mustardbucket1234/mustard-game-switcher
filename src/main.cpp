@@ -269,6 +269,7 @@ void setAppState(AppState state)
                   { return a.name < b.name; });
     }
 }
+
 void nextAppState(int i)
 {
     setAppState(static_cast<AppState>((appState + i) % 3));
