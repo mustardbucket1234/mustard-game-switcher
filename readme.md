@@ -1,4 +1,4 @@
-# GameSwitcher Protoype for RG35XX+ muOS v10
+# GameSwitcher Protoype for RG35XX+ muOS v11.1
 
 A GameSwitcher app for muOS v11.1 inspired by onionOS
 
