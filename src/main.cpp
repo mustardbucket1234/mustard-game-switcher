@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <thread>
 #include <chrono>
+#include <cstdlib>
 
 #include "font.h"
 #include "gameInfo.h"
@@ -34,13 +35,15 @@ string ROM_GO = "/tmp/rom_go";
 bool debugMode = true;
 string MUOS_HISTORY_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/info/history";
 string MUOS_FAVORITE_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/info/favourite";
-string MUOS_SAVE_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/save/state";
+string MUOS_SAVE_DIR;
 #else
 bool debugMode = false;
 string MUOS_HISTORY_DIR = "/mnt/mmc/MUOS/info/history";
 string MUOS_FAVORITE_DIR = "/mnt/mmc/MUOS/info/favourite";
-string MUOS_SAVE_DIR = "/mnt/mmc/MUOS/save/state";
+string MUOS_SAVE_DIR;
 #endif
+
+
 
 SDL_Color defaultTextColor = {255, 255, 255, 255};
 SDL_Color shadowTextColor = {0, 0, 0, 225};
@@ -73,6 +76,47 @@ double approachCamY;
 
 int dirXInput = 0;
 int dirYInput = 0;
+
+std::pair<std::string, std::string> pathvar() {
+    std::ifstream configFile("/mnt/mmc/MUOS/retroarch/retroarch.cfg");
+    std::ofstream logFile("log.txt");
+
+    std::string savefileDir, savestateDir;
+
+    if (configFile.is_open() && logFile.is_open()) {
+        std::string line;
+        std::string targetWord1 = "savefile_directory";
+        std::string targetWord2 = "savestate_directory";
+
+        while (std::getline(configFile, line)) {
+            if (line.find(targetWord1) == 0) {
+                // Extract path value from the line (assuming the path is surrounded by double quotes)
+                savefileDir = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
+            }
+            if (line.find(targetWord2) == 0) {
+                // Extract path value from the line (assuming the path is surrounded by double quotes)
+                savestateDir = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
+            }
+        }
+
+        if (!savefileDir.empty() && !savestateDir.empty()) {
+            // Output the path values to the log file
+            logFile << savefileDir << std::endl;
+            logFile << savestateDir << std::endl;
+
+            std::cout << "Paths extracted and logged successfully." << std::endl;
+        } else {
+            std::cout << "No lines starting with \"" << targetWord1 << "\" and \"" << targetWord2 << "\" found in the config file." << std::endl;
+        }
+    } else {
+        std::cout << "Failed to open config file or log file." << std::endl;
+    }
+
+    configFile.close();
+    logFile.close();
+
+    return std::make_pair(savefileDir, savestateDir);
+}
 
 void initSDL()
 {
@@ -525,7 +569,8 @@ int main(int argc, char *argv[])
         recentGameList = loadGameListAtPath(MUOS_HISTORY_DIR);
         favoriteGameList = loadGameListAtPath(MUOS_FAVORITE_DIR);
         currentGameList = recentGameList;
-
+        MUOS_SAVE_DIR = pathvar().second;
+        
         // Trim list to 10 games
         // if (recentGameList.size() > 10)
         // {
