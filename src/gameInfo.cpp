@@ -181,8 +181,11 @@ GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
             {
                 for (const auto &entry : filesystem::directory_iterator(subFolderPath))
                 {
-                    //logic here looks broken to me but it works
-                    if (!(entry.path().extension() == ".png" && strStartsWith(strToUpper(entry.path().filename()), strToUpper(game.name)) && entry.file_size() < 400 && !strEndsWith(entry.path().filename(), ".auto")))
+                    //logic here is broken, but it works and needs cleaned up
+                    std::string extension = entry.path().extension().string();
+                    std::string fileName = entry.path().filename().string();
+                    std::string screenshotName = fileName.substr(0, fileName.find('.'));
+                    if (!(extension == ".png" && strStartsWith(strToUpper(screenshotName), strToUpper(game.name)) && entry.file_size() < 400 && !strEndsWith(fileName, ".auto")))
                     {
                         screenShots.push_back(entry);
                     }
