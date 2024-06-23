@@ -160,6 +160,10 @@ void renderBlackScreen()
 // Render screen
 void renderGameSwitcher()
 {
+    // Display background
+    string background = "assets/theme/bg.png";
+    mrenderer->draw(background, 0, 0, swWidth, swHeight);
+
     if (isPictureView)
     {
         approachCamX = 0;
