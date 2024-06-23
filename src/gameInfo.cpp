@@ -181,7 +181,8 @@ GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
             {
                 for (const auto &entry : filesystem::directory_iterator(subFolderPath))
                 {
-                    if (entry.path().extension() == ".png" && strStartsWith(strToUpper(entry.path().filename()), strToUpper(game.name)) && entry.file_size() > 400)
+                    //logic here looks broken to me but it works
+                    if (!(entry.path().extension() == ".png" && strStartsWith(strToUpper(entry.path().filename()), strToUpper(game.name)) && entry.file_size() < 400 && !strEndsWith(entry.path().filename(), ".auto")))
                     {
                         screenShots.push_back(entry);
                     }
