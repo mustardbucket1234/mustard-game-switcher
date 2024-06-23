@@ -1,6 +1,6 @@
 # GameSwitcher Protoype for RG35XX+ muOS v10
 
-A GameSwitcher app for muOS v10 inspired by onionOS
+A GameSwitcher app for muOS v11.1 inspired by onionOS
 
 <div>
 <img src="https://i.imgur.com/a1uIJaF.png" width="300">
@@ -30,13 +30,11 @@ This will allow you to resume the GameSwitcher when you power the device down
 
 2. From the muOS main menu, open `Retroarch`. Then go into `Settings -> Saving` and toggle
 
-- `Save State Thumbnails: ON`
-- `Sort Save States into Folders by Core Name: ON`
-- `Save State Thumbnails: ON`
-- `Auto Save State: ON`
-- `Auto Load State: ON`
-
-In `Settings -> Input -> Hotkeys` configure a Quit button. I have mine set to `Menu + Select`
+- `Save State Thumbnails: ON`- default
+- `Sort Save States into Folders by Core Name: ON`- default
+- `Save State Thumbnails: ON`- default
+- `Auto Save State: ON`- not default
+- `Auto Load State: ON`- not default
 
 Once you've completed this, make sure to save your configuration (`Configuration File -> Save Current Configuration`)
 
