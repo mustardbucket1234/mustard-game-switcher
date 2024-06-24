@@ -57,3 +57,20 @@ Download Link: https://github.com/rg35xx-cfw/rg35xx-cfw.github.io/releases/tag/r
 
 You can also test the app on your PC by running `./buildX86.sh`, just make sure you have SDL2 and all other packages installed.
 You will also need to copy some of the files onto `/mnt/muOSDump/` to test it properly.
+
+Personal ToDo:
+- double game enteries in history list
+- screenshots only displaying for 2 titles at a time
+- screenshots not always sync'd with correct title
+- dynamic savestate location only working when mapped to SD1
+- better / cleanup debugging & logging solution
+- add/utilize MUOS theme & elements
+- Support for external (non-retroarch) emulators
+- find auto-start solution (may need to be mainlined into MUOS)
+- copy to archive zip automatically on compilation
+  
+Additions & bugs fixed from main
++ got running on MUOS 11.1
++ implemented background image asset as background image
++ dynamic savestate screenshot location from retroarch config (only SD1 for now)
++ archive .zip package installs under applications like dingux commander etc
