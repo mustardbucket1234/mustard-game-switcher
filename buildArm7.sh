@@ -21,7 +21,7 @@ echo "**Backup the existing build**"
 
 # Create the directory structure
 mkdir -p dist/mnt/mmc/MUOS/application/.MustardGameSwitcher/bin
-cp -r output/arm7/bin dist/mnt/mmc/MUOS/application/.MustardGameSwitcher/bin
+cp -r output/arm7/bin dist/mnt/mmc/MUOS/application/.MustardGameSwitcher
 echo "**Copied the files to the directory structure**"
 
 # Zip the directory structure
