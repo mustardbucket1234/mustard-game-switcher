@@ -13,10 +13,11 @@ It also allows for setting up a quick save, shutoff, and resume feature (with so
 This app was developed rapidly so it may have bugs. Backup your saves / games before installing.
 
 # How To Install:
-1. Ensure you have muOS v10 installed and you're running it on a RG35XX+
-2. Download the latest release ZIP (https://github.com/mustardbucket1234/mustard-game-switcher/releases/tag/release)
-3. Copy the contents of the ZIP into the `ROMS` folder of your RG35XX+ SD card 
-4. Navigate to the GameSwitcher on your RG35XX+, and launch it as *External - Ports* (press SELECT if it doesn't work automatically)
+Copy to main SD under ARCHIVE (will have Retroarch Cheats.zip already there on fresh image)
+
+Install by going from the MUOS Main Menu > APPLICATIONS > Archive Manger > MustardGameSwitcher
+
+Launch by going to MUOS Main Menu > APPLICATIONS > MustardGameSwitcher
 
 After launching, you should now see your recent Retroarch games show up.
 
