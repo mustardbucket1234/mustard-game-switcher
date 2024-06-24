@@ -68,10 +68,11 @@ Personal ToDo:
 - add/utilize MUOS theme & elements
 - Support for external (non-retroarch) emulators
 - find auto-start solution (may need to be mainlined into MUOS)
-- copy to archive zip automatically on compilation
+
   
 Additions & bugs fixed from main
 + got running on MUOS 11.1
 + implemented background image asset as background image
 + dynamic savestate screenshot location from retroarch config (only SD1 for now)
 + archive .zip package installs under applications like dingux commander etc
++ copy to archive zip automatically on compilation
