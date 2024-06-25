@@ -621,7 +621,11 @@ int main(int argc, char *argv[])
                 printf("Name: %s\n", selectedGame.name.c_str());
 
                 printf("Writing Game Info\n");
-                string historyPath = MUOS_HISTORY_DIR + "/" + selectedGame.name + ".cfg";
+                string historyPath = MUOS_HISTORY_DIR + "/" + selectedGame.name.substr(0, selectedGame.name.find_last_of(".")) + ".cfg";
+                size_t zipPos = historyPath.find_last_of(".zip"); 
+                if (zipPos != string::npos) {
+                    historyPath = historyPath.substr(0, zipPos) + ".cfg";
+                }
 
                 if (!debugMode)
                 {
