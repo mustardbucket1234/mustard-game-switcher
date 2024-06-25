@@ -1,6 +1,6 @@
-# GameSwitcher Protoype for RG35XX+ muOS v10
+# GameSwitcher Protoype for RG35XX+ muOS v11.1
 
-A GameSwitcher app for muOS v10 inspired by onionOS
+A GameSwitcher app for muOS v11.1 inspired by onionOS
 
 <div>
 <img src="https://i.imgur.com/a1uIJaF.png" width="300">
@@ -13,10 +13,11 @@ It also allows for setting up a quick save, shutoff, and resume feature (with so
 This app was developed rapidly so it may have bugs. Backup your saves / games before installing.
 
 # How To Install:
-1. Ensure you have muOS v10 installed and you're running it on a RG35XX+
-2. Download the latest release ZIP (https://github.com/mustardbucket1234/mustard-game-switcher/releases/tag/release)
-3. Copy the contents of the ZIP into the `ROMS` folder of your RG35XX+ SD card 
-4. Navigate to the GameSwitcher on your RG35XX+, and launch it as *External - Ports* (press SELECT if it doesn't work automatically)
+Copy to main SD under ARCHIVE (will have Retroarch Cheats.zip already there on fresh image)
+
+Install by going from the MUOS Main Menu > APPLICATIONS > Archive Manger > MustardGameSwitcher
+
+Launch by going to MUOS Main Menu > APPLICATIONS > MustardGameSwitcher
 
 After launching, you should now see your recent Retroarch games show up.
 
@@ -30,13 +31,11 @@ This will allow you to resume the GameSwitcher when you power the device down
 
 2. From the muOS main menu, open `Retroarch`. Then go into `Settings -> Saving` and toggle
 
-- `Save State Thumbnails: ON`
-- `Sort Save States into Folders by Core Name: ON`
-- `Save State Thumbnails: ON`
-- `Auto Save State: ON`
-- `Auto Load State: ON`
-
-In `Settings -> Input -> Hotkeys` configure a Quit button. I have mine set to `Menu + Select`
+- `Save State Thumbnails: ON`- default
+- `Sort Save States into Folders by Core Name: ON`- default
+- `Save State Thumbnails: ON`- default
+- `Auto Save State: ON`- not default
+- `Auto Load State: ON`- not default
 
 Once you've completed this, make sure to save your configuration (`Configuration File -> Save Current Configuration`)
 
@@ -59,3 +58,22 @@ Download Link: https://github.com/rg35xx-cfw/rg35xx-cfw.github.io/releases/tag/r
 
 You can also test the app on your PC by running `./buildX86.sh`, just make sure you have SDL2 and all other packages installed.
 You will also need to copy some of the files onto `/mnt/muOSDump/` to test it properly.
+
+Personal ToDo:
+
+- better / cleanup debugging & logging solution
+- add/utilize MUOS theme & elements
+- Support for external (non-retroarch) emulators
+- find auto-start solution (may need to be mainlined into MUOS)
+
+  
+Additions & bugs fixed from main
++ got running on MUOS 11.1
++ implemented background image asset as background image
++ dynamic savestate screenshot location from retroarch config (only SD1 for now)
++ archive .zip package installs under applications like dingux commander etc
++ copy to archive zip automatically on compilation
++ double game enteries in history list
++ screenshots only displaying for 1 title per system / not always sync'd with correct title
++ dynamic savestate location only working when mapped to SD1
+

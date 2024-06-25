@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <thread>
 #include <chrono>
+#include <cstdlib>
 
 #include "font.h"
 #include "gameInfo.h"
@@ -34,13 +35,15 @@ string ROM_GO = "/tmp/rom_go";
 bool debugMode = true;
 string MUOS_HISTORY_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/info/history";
 string MUOS_FAVORITE_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/info/favourite";
-string MUOS_SAVE_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/save/state";
+string MUOS_SAVE_DIR;
 #else
 bool debugMode = false;
 string MUOS_HISTORY_DIR = "/mnt/mmc/MUOS/info/history";
 string MUOS_FAVORITE_DIR = "/mnt/mmc/MUOS/info/favourite";
-string MUOS_SAVE_DIR = "/mnt/mmc/MUOS/save/state";
+string MUOS_SAVE_DIR;
 #endif
+
+
 
 SDL_Color defaultTextColor = {255, 255, 255, 255};
 SDL_Color shadowTextColor = {0, 0, 0, 225};
@@ -74,6 +77,47 @@ double approachCamY;
 int dirXInput = 0;
 int dirYInput = 0;
 
+std::pair<std::string, std::string> pathvar() {
+    std::ifstream configFile("/mnt/mmc/MUOS/retroarch/retroarch.cfg");
+    std::ofstream logFile("log.txt");
+
+    std::string savefileDir, savestateDir;
+
+    if (configFile.is_open() && logFile.is_open()) {
+        std::string line;
+        std::string targetWord1 = "savefile_directory";
+        std::string targetWord2 = "savestate_directory";
+
+        while (std::getline(configFile, line)) {
+            if (line.find(targetWord1) == 0) {
+                // Extract path value from the line (assuming the path is surrounded by double quotes)
+                savefileDir = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
+            }
+            if (line.find(targetWord2) == 0) {
+                // Extract path value from the line (assuming the path is surrounded by double quotes)
+                savestateDir = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
+            }
+        }
+
+        if (!savefileDir.empty() && !savestateDir.empty()) {
+            // Output the path values to the log file
+            logFile << savefileDir << std::endl;
+            logFile << savestateDir << std::endl;
+
+            std::cout << "Paths extracted and logged successfully." << std::endl;
+        } else {
+            std::cout << "No lines starting with \"" << targetWord1 << "\" and \"" << targetWord2 << "\" found in the config file." << std::endl;
+        }
+    } else {
+        std::cout << "Failed to open config file or log file." << std::endl;
+    }
+
+    configFile.close();
+    logFile.close();
+
+    return std::make_pair(savefileDir, savestateDir);
+}
+
 void initSDL()
 {
 
@@ -95,10 +139,10 @@ void initSDL()
         mrenderer = new Mustard::Renderer(renderer);
     }
     TTF_Init();
-    defaultFont = TTF_OpenFont("assets/font/Allerta-Regular.ttf", 24);
-    mdFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 28);
-    lgFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 38);
-    titleFont = TTF_OpenFont("assets/font/BPreplayBold.otf", 45);
+    defaultFont = TTF_OpenFont("assets/font/Orbitron-Medium-Uppercase.ttf", 24);
+    mdFont = TTF_OpenFont("assets/font/Orbitron-Medium-Uppercase.ttf", 28);
+    lgFont = TTF_OpenFont("assets/font/Orbitron-Medium-Uppercase.ttf", 38);
+    titleFont = TTF_OpenFont("assets/font/Orbitron-Medium-Uppercase.ttf", 45);
 }
 
 // Clear buffers
@@ -116,6 +160,10 @@ void renderBlackScreen()
 // Render screen
 void renderGameSwitcher()
 {
+    // Display background
+    string background = "assets/theme/bg.png";
+    mrenderer->draw(background, 0, 0, swWidth, swHeight);
+
     if (isPictureView)
     {
         approachCamX = 0;
@@ -269,6 +317,7 @@ void setAppState(AppState state)
                   { return a.name < b.name; });
     }
 }
+
 void nextAppState(int i)
 {
     setAppState(static_cast<AppState>((appState + i) % 3));
@@ -524,7 +573,8 @@ int main(int argc, char *argv[])
         recentGameList = loadGameListAtPath(MUOS_HISTORY_DIR);
         favoriteGameList = loadGameListAtPath(MUOS_FAVORITE_DIR);
         currentGameList = recentGameList;
-
+        MUOS_SAVE_DIR = pathvar().second;
+        
         // Trim list to 10 games
         // if (recentGameList.size() > 10)
         // {
@@ -571,7 +621,11 @@ int main(int argc, char *argv[])
                 printf("Name: %s\n", selectedGame.name.c_str());
 
                 printf("Writing Game Info\n");
-                string historyPath = MUOS_HISTORY_DIR + "/" + selectedGame.name + ".cfg";
+                string historyPath = MUOS_HISTORY_DIR + "/" + selectedGame.name.substr(0, selectedGame.name.find_last_of(".")) + ".cfg";
+                size_t zipPos = historyPath.find_last_of(".zip"); 
+                if (zipPos != string::npos) {
+                    historyPath = historyPath.substr(0, zipPos) + ".cfg";
+                }
 
                 if (!debugMode)
                 {

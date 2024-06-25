@@ -1,0 +1,21 @@
+Archive skeleton
+├─ZIP─/mnt
+│       └──mmc
+│           └──MUOS
+│               └──application
+│                     ├──MustardGameSwitcher.sh <main script>
+│                     └──.MustardGameSwitcher
+│                                   ├──DebugLog.sh <debug script>
+│                                   └──bin
+│                                       ├──app <main binary>
+│                                       └──assets
+│                                            ├──font
+│                                            │   └──<fontfiles>
+│                                            ├──sh
+│                                            │   └──<scripts>
+│                                            └──theme
+│                                                └──<images>
+│                                                       ├──bg.png <background>
+│                                                       ├──footer.png <bottom bar>
+│                                                       └──header <titlebar>
+└──_skeleton_.txt <don't include in zip>
