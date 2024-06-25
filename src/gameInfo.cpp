@@ -181,11 +181,9 @@ GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
             {
                 for (const auto &entry : filesystem::directory_iterator(subFolderPath))
                 {
-                    //logic here is broken, but it works and needs cleaned up
                     std::string extension = entry.path().extension().string();
                     std::string fileName = entry.path().filename().string();
-                    std::string screenshotName = fileName.substr(0, fileName.find('.'));
-                    if (!(extension == ".png" && strStartsWith(strToUpper(screenshotName), strToUpper(game.name)) && entry.file_size() < 400 && !strEndsWith(fileName, ".auto")))
+                    if (extension == ".png")
                     {
                         screenShots.push_back(entry);
                     }
@@ -196,7 +194,26 @@ GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
                 if (screenShots.size() > 0)
                 {
                     visualData.active = true;
-                    visualData.filePath = screenShots[0].path().string();
+                    std::string gameFileName = game.fileName;
+                    std::size_t dotIndex = gameFileName.find(".");
+                    if (dotIndex != std::string::npos)
+                    {
+                        gameFileName = gameFileName.substr(0, dotIndex);
+                    }
+                    for (const auto &entry : screenShots)
+                    {
+                        std::string fileName = entry.path().filename().string();
+                        std::size_t dotIndex = fileName.find(".");
+                        if (dotIndex != std::string::npos)
+                        {
+                            fileName = fileName.substr(0, dotIndex);
+                        }
+                        if (fileName == gameFileName)
+                        {
+                            visualData.filePath = entry.path().string();
+                            break;
+                        }
+                    }
                 }
             }
         }
